@@ -87,21 +87,19 @@ class CNN(nn.Module):
         return output, x # Output the last layer as well
 
 # %%
-cnn = CNN()
+cnn = CNN().to(device)
 print(cnn)
 
-# %%
 loss_func = nn.CrossEntropyLoss()   
 loss_func
 
-# %%
 optimizer = optim.Adam(cnn.parameters(), lr = 0.01)   
 optimizer
 
 # %%
 NUM_EPOCHS = 10
 
-def train(num_epochs, cnn, loaders):
+def train(num_epochs, cnn, loaders, device):
     cnn.train()
 
     total_step = len(loaders['train'])
@@ -110,8 +108,8 @@ def train(num_epochs, cnn, loaders):
         for i, (images, labels) in enumerate(loaders['train']):
             
             # gives batch data, normalize x when iterate train_loader
-            b_x = Variable(images)   # batch x
-            b_y = Variable(labels)   # batch y
+            b_x = Variable(images).to(device)   # batch x
+            b_y = Variable(labels).to(device)   # batch y
 
             output = cnn(b_x)[0]
             loss = loss_func(output, b_y)
@@ -124,7 +122,7 @@ def train(num_epochs, cnn, loaders):
                 print ('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}' 
                        .format(epoch + 1, num_epochs, i + 1, total_step, loss.item()))
         
-train(NUM_EPOCHS, cnn, loaders)
+train(NUM_EPOCHS, cnn, loaders, device)
 
 # %%
 def test():
