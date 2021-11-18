@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # %%
 import matplotlib.pyplot as plt
 import torch
@@ -10,6 +11,17 @@ from torchvision.transforms import ToTensor
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(device)
+
+# %%
+import wandb
+
+wandb.init(project="wandb_practice_pytorch", entity="poomstas")
+
+wandb.config = {
+    'learning_rate': 0.001, 
+    'epochs': 100, 
+    'batch_size' : 128,
+}
 
 # %%
 train_data = datasets.MNIST(
@@ -97,7 +109,7 @@ optimizer = optim.Adam(cnn.parameters(), lr = 0.01)
 optimizer
 
 # %%
-NUM_EPOCHS = 10
+NUM_EPOCHS = 15
 
 def train(num_epochs, cnn, loaders, device):
     cnn.train()
@@ -105,6 +117,8 @@ def train(num_epochs, cnn, loaders, device):
     total_step = len(loaders['train'])
         
     for epoch in range(num_epochs):
+        wandb.watch(cnn)
+
         for i, (images, labels) in enumerate(loaders['train']):
             
             # gives batch data, normalize x when iterate train_loader
@@ -113,6 +127,7 @@ def train(num_epochs, cnn, loaders, device):
 
             output = cnn(b_x)[0]
             loss = loss_func(output, b_y)
+            wandb.log({'loss': loss})
             
             optimizer.zero_grad()
             loss.backward()
