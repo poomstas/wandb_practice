@@ -128,12 +128,12 @@ train(NUM_EPOCHS, cnn, loaders, device)
 def test():
     cnn.eval()
     with torch.no_grad():
-        correct = 0
-        total = 0
         for images, labels in loaders['test']:
-            test_output, last_layer = cnn(images)
+            test_output, _ = cnn(images.to(device))
             pred_y = torch.max(test_output, 1)[1].data.squeeze()
-            accuracy = (pred_y == labels).sum().item() / float(labels.size(0))
-        print('Test Accuracy of the model on the 10000 test images: %.2f' % accuracy)
+            accuracy = (pred_y == labels.to(device)).sum().item() / float(labels.size(0))
+        print('Test Accuracy of the model on the 10000 test images: %.3f' % accuracy)
 
 test()
+
+# %%
