@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+
 # %%
 import matplotlib.pyplot as plt
 import torch
@@ -15,13 +16,14 @@ print(device)
 # %%
 import wandb
 
-wandb.init(project="wandb_practice_pytorch", entity="poomstas")
-
-wandb.config = {
+hyperparameter_defaults = {
     'learning_rate': 0.001, 
     'epochs': 100, 
     'batch_size' : 128,
 }
+
+wandb.init(config=hyperparameter_defaults, project="wandb_practice_pytorch", entity="poomstas")
+config = wandb.config
 
 # %%
 train_data = datasets.MNIST(
@@ -58,12 +60,12 @@ plt.show()
 # %%
 loaders = {
     'train' : DataLoader(train_data, 
-                         batch_size=100, 
+                         batch_size=config.batch_size, 
                          shuffle=True, 
                          num_workers=1),
     
     'test'  : DataLoader(test_data, 
-                         batch_size=100, 
+                         batch_size=config.batch_size, 
                          shuffle=True, 
                          num_workers=1),
 }
@@ -105,12 +107,10 @@ print(cnn)
 loss_func = nn.CrossEntropyLoss()   
 loss_func
 
-optimizer = optim.Adam(cnn.parameters(), lr = 0.01)   
+optimizer = optim.Adam(cnn.parameters(), lr = config.learning_rate)
 optimizer
 
 # %%
-NUM_EPOCHS = 15
-
 def train(num_epochs, cnn, loaders, device):
     cnn.train()
 
@@ -137,7 +137,7 @@ def train(num_epochs, cnn, loaders, device):
                 print ('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}' 
                        .format(epoch + 1, num_epochs, i + 1, total_step, loss.item()))
         
-train(NUM_EPOCHS, cnn, loaders, device)
+train(config.epochs, cnn, loaders, device)
 
 # %%
 def test():
